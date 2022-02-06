@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
-import UserBar from './src/user/UserBar';
-import CreatePost from './src/post/CreatePost';
-import PostList from './src/post/PostList';
+import React, { useReducer, useEffect } from 'react'
 
-export default function App (){
-  const [user, setUser] =  useState('');
-  const [posts, setPosts] = useState(defaultposts);
-const defaultposts = [
- { title: 'React Hooks', content: 'The greatest thing since sliced bread!', author: 'Daniel Bugl' },
- { title: 'Using React Fragments', content: 'Keeping the DOMtree clean!', author: 'Daniel Bugl' }
+import PostList from './post/PostList'
+import CreatePost from './post/CreatePost'
+import UserBar from './user/UserBar'
+import appReducer from './reducers'
+
+const defaultPosts = [
+    { title: 'React Hooks', content: 'The greatest thing since sliced bread!', author: 'Daniel Bugl' },
+    { title: 'Using React Fragments', content: 'Keeping the DOM tree clean!', author: 'Daniel Bugl' }
 ]
-  return(
-    <>
-    <h1>This is the app page</h1>
-    <div style = {{padding : 8}}>
-      <UserBar user = {user} setUser = {setUser} />
-      <br />
-      {user && <CreatePost user = {user} posts = {posts} setPosts = {setPosts} />}
-      <PostList posts = {posts} />
-    </div>
-    </>
-  );
+
+export default function App () {
+    const [ state, dispatch ] = useReducer(appReducer, { user: '', posts: defaultPosts })
+    const { user, posts } = state
+    
+    useEffect(()=>{ 
+        if(user){
+            document.title = `${user} -- React Hooks Blog`;
+        }else{
+            document.title = "react hooks blog";
+        }
+    }, [user])
+    return (
+        <div style={{ padding: 8 }}>
+            <UserBar user={user} dispatch={dispatch} />
+            <br />
+            {user && <CreatePost user={user} posts={posts} dispatch={dispatch} />}
+            <br />
+            <hr />
+            <PostList posts={posts} />
+        </div>
+    )
 }
