@@ -1,24 +1,58 @@
-import React, { useState } from 'react';
-import UserBar from './src/user/UserBar';
-import CreatePost from './src/post/CreatePost';
-import PostList from './src/post/PostList';
+import React, { useReducer, useEffect, useState } from "react";
+import { ThemeContext, StateContext } from "./contexts";
 
-export default function App (){
-  const [user, setUser] =  useState('');
-  const [posts, setPosts] = useState(defaultposts);
-const defaultposts = [
- { title: 'React Hooks', content: 'The greatest thing since sliced bread!', author: 'Daniel Bugl' },
- { title: 'Using React Fragments', content: 'Keeping the DOMtree clean!', author: 'Daniel Bugl' }
-]
-  return(
-    <>
-    <h1>This is the app page</h1>
-    <div style = {{padding : 8}}>
-      <UserBar user = {user} setUser = {setUser} />
-      <br />
-      {user && <CreatePost user = {user} posts = {posts} setPosts = {setPosts} />}
-      <PostList posts = {posts} />
-    </div>
-    </>
+import PostList from "./post/PostList";
+import CreatePost from "./post/CreatePost";
+import UserBar from "./user/UserBar";
+import appReducer from "./reducers";
+import Header from "./Header";
+import ChangeTheme from "./ChangeTheme";
+
+const defaultPosts = [
+  {
+    title: "React Hooks",
+    content: "The greatest thing since sliced bread!",
+    author: "Daniel Bugl",
+  },
+  {
+    title: "Using React Fragments",
+    content: "Keeping the DOM tree clean!",
+    author: "Daniel Bugl",
+  },
+];
+
+export default function App() {
+  const [theme, setTheme] = useState({
+    primaryColor: "deepskyblue",
+    secondaryColor: "coral",
+  });
+  const [state, dispatch] = useReducer(appReducer, {
+    user: "",
+    posts: defaultPosts,
+  });
+  const { user, posts } = state;
+
+  useEffect(() => {
+    if (user) {
+      document.title = `${user} -- React Hooks Blog`;
+    } else {
+      document.title = "react hooks blog";
+    }
+  }, [user]);
+  return (
+    <StateContext.Provider value = {{state, dispatch}}>
+      <ThemeContext.Provider value={theme}>
+        <div style={{ padding: 8 }}>
+          <Header text="React Hooks Blog" />
+          <ChangeTheme theme={theme} setTheme={setTheme} />
+          <UserBar />
+          <br />
+          {user && <CreatePost />}
+          <br />
+          <hr />
+          <PostList/>
+        </div>
+      </ThemeContext.Provider>
+    </StateContext.Provider>
   );
 }
